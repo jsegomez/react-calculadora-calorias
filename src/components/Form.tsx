@@ -1,9 +1,17 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, Dispatch, FormEvent, useState } from "react";
+import { v4 as uuid } from 'uuid';
+
 import { categories } from "../data/categories";
 import { Activity } from "../types";
+import { ActivityActions } from "../reducers/activity-reducer";
 
-export default function Form() {
+type FormProps = {
+    dispatch: Dispatch<ActivityActions>
+}
+
+export default function Form({dispatch} : FormProps) {
     const [activity, setActivity] = useState<Activity>({
+        id: '',
         category: 1,
         name: '',
         calories: 0
@@ -14,6 +22,7 @@ export default function Form() {
 
         setActivity({
             ...activity,
+            id: uuid(),
             [e.target.id]: value
         });
     }
@@ -25,7 +34,8 @@ export default function Form() {
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log(e.target);
+        dispatch({ type: 'save-activity', payload: { newActivity: activity } });
+        setActivity({id: '', category: 1, name: '',calories: 0 });
     }
 
   return (
@@ -35,7 +45,7 @@ export default function Form() {
             <select
                 id="category"                
                 className="border border-slate-300 p2 rounder-lg w-full bg-white"
-                defaultValue={activity.category}
+                value={activity.category}
                 onChange={(e) => handleChange(e)}
             >
                 { 
@@ -53,7 +63,7 @@ export default function Form() {
                 type="text"
                 className="border border-slate-300 p-2 rounder-lg"
                 placeholder="Ej: Comerida, Jugo de naranja, Ejercicio, Ensalada, etc"
-                defaultValue={activity.name}
+                value={activity.name}
                 onChange={(e) => handleChange(e)}
             />
         </div>
@@ -66,7 +76,7 @@ export default function Form() {
                 min={0}
                 className="border border-slate-300 p-2 rounder-lg"
                 placeholder="Ejemplo: 100"
-                defaultValue={activity.calories}   
+                value={activity.calories}   
                 onChange={(e) => handleChange(e)}
             />
         </div>
